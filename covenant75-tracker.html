@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#111111">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Covenant 75 — Tracker</title>
+<style>
+:root{
+  --bg:#ffffff;--text:#181818;--text2:#555555;--text3:#8a8a8a;--border:#e6e6e6;
+  --muted:#f4f4f4;--accent:#2563eb;--green:#16a34a;--amber:#c2740a;--red:#dc2626;
+}
+@media (prefers-color-scheme: dark){
+  :root{--bg:#101010;--text:#ececec;--text2:#b0b0b0;--text3:#767676;--border:#2b2b2b;
+  --muted:#1b1b1b;--accent:#4c8dff;--green:#2fbf62;--amber:#e8a13c;--red:#f0564f}
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{font-size:16px}
+body{margin:0;background:var(--bg);color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  padding-bottom:84px}
+.wrap{max-width:640px;margin:0 auto;padding:16px 16px 32px}
+button,input,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+.num{font-variant-numeric:tabular-nums;font-feature-settings:"tnum" 1}
+h1{font-size:17px;font-weight:600;margin:0}
+.sub{font-size:12px;color:var(--text3);margin-top:2px}
+.head{display:flex;flex-wrap:wrap;align-items:flex-start;gap:12px;margin-bottom:12px}
+.daynav{display:flex;align-items:center;gap:8px;margin-left:auto}
+.daynav button{width:36px;height:36px;border-radius:8px;border:1px solid var(--border);background:transparent;font-size:18px}
+.daynav input{width:64px;height:36px;border-radius:10px;border:1px solid var(--border);background:transparent;text-align:center;font-size:16px}
+.phase{font-size:12px;color:var(--text3);margin:0 0 12px}
+.phase b{color:var(--text2);font-weight:600}
+.bar{height:6px;border-radius:999px;background:var(--muted);overflow:hidden;margin-bottom:8px}
+.bar i{display:block;height:100%;background:var(--text);transition:width .25s ease}
+.barlbl{font-size:12px;color:var(--text3);margin-bottom:16px}
+.sec{font-size:14px;font-weight:600;margin:20px 0 8px}
+.sec small{display:block;font-weight:400;font-size:12px;color:var(--text3);margin-top:2px}
+.trow{display:grid;grid-template-columns:1fr 120px 36px;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border)}
+.trow .nm{font-size:14px;color:var(--text2)}
+.trow .val{font-size:14px;text-align:right;font-weight:600}
+input[type=range]{width:100%;accent-color:var(--text)}
+.ttotal{display:flex;justify-content:space-between;align-items:center;margin-top:8px;padding:10px 12px;border-radius:10px;font-size:14px}
+.ttotal b{font-weight:600}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:10px}
+.cell{border:1px solid var(--border);border-radius:10px;padding:10px 12px}
+.cell label{display:block;font-size:11px;color:var(--text3);margin-bottom:6px}
+.cell input{width:100%;border:none;background:transparent;font-size:17px;font-weight:500}
+.cell input:focus{outline:none}
+.chips{display:flex;gap:4px}
+.chips button{flex:1;height:32px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--text2);font-size:13px}
+.chips button.on{background:var(--text);color:var(--bg);border-color:var(--text)}
+.tog{width:100%;height:32px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--text2);font-size:13px}
+.tog.on{background:var(--text);color:var(--bg);border-color:var(--text)}
+.savebar{position:fixed;bottom:0;left:0;right:0;background:var(--bg);border-top:1px solid var(--border);padding:10px 16px calc(10px + env(safe-area-inset-bottom))}
+.savebar .inner{max-width:640px;margin:0 auto;display:flex;gap:8px}
+.savebar button{height:44px;border-radius:10px;font-size:15px;font-weight:600}
+.save{flex:1;border:none;background:var(--text);color:var(--bg)}
+.clear2{width:96px;border:1px solid var(--border);background:transparent;color:var(--text3)}
+.saved{font-size:12px;color:var(--green);margin:8px 0 0;opacity:0;transition:opacity .15s}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(108px,1fr));gap:10px;margin-bottom:8px}
+.stat .v{font-size:24px;font-weight:600;line-height:1.2}
+.stat .k{font-size:11px;color:var(--text3)}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{font-size:11px;font-weight:500;color:var(--text3);text-align:left;padding:6px 8px;border-bottom:1px solid var(--border)}
+td{padding:7px 8px;border-bottom:1px solid var(--border);color:var(--text2)}
+.pill{display:inline-block;padding:2px 8px;border-radius:6px;font-size:12px;font-weight:600}
+.empty{font-size:13px;color:var(--text3);padding:8px 0}
+details{border:1px solid var(--border);border-radius:10px;margin-top:20px}
+summary{padding:12px 14px;font-size:14px;font-weight:600;list-style:none}
+summary::-webkit-details-marker{display:none}
+.detbody{padding:0 14px 14px}
+.detbody .row{margin-bottom:10px}
+.detbody label{display:block;font-size:12px;color:var(--text3);margin-bottom:4px}
+.detbody input,.detbody textarea{width:100%;border:1px solid var(--border);border-radius:8px;background:transparent;padding:8px 10px;font-size:14px}
+.detbody textarea{resize:vertical;min-height:56px}
+.btnrow{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.btnrow button{height:38px;padding:0 14px;border-radius:10px;border:1px solid var(--border);background:transparent;font-size:13px}
+.btnrow .danger{color:var(--red);border-color:var(--red)}
+.ghostbtn{width:100%;height:38px;border-radius:10px;border:1px solid var(--border);background:transparent;font-size:14px;margin-top:12px}
+.toast{position:fixed;left:50%;bottom:96px;transform:translateX(-50%);background:var(--text);color:var(--bg);padding:8px 16px;border-radius:999px;font-size:13px;opacity:0;pointer-events:none;transition:opacity .2s;z-index:9}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="head">
+    <div>
+      <h1>The covenant — 75 day tracker</h1>
+      <div class="sub">Miss one, restart at day 1. Log every night at 21:00.</div>
+    </div>
+    <div class="daynav">
+      <button id="prev" aria-label="previous day">&minus;</button>
+      <input id="day" type="number" min="1" max="75" value="1">
+      <button id="next" aria-label="next day">+</button>
+    </div>
+  </div>
+  <p class="phase" id="phase"></p>
+  <div class="bar"><i id="bar" style="width:0%"></i></div>
+  <div class="barlbl" id="barlbl"></div>
+
+  <div class="sec">Trading scorecard <small>Grade tonight's discipline, /50. Below 40 twice in a row = sim only next day.</small></div>
+  <div id="trows"></div>
+  <div class="ttotal" id="ttotal"><span>Trading total</span><b class="num" id="ttotalv">&ndash; / 50</b></div>
+
+  <div class="sec">Daily metrics</div>
+  <div class="grid">
+    <div class="cell"><label>Body weight (kg)</label><input id="weight" type="number" step="0.1" min="30" max="300" inputmode="decimal" placeholder="&ndash;"></div>
+    <div class="cell"><label>Workouts done</label><div class="chips" id="workouts"><button data-v="0">0</button><button data-v="1">1</button><button data-v="2">2</button></div></div>
+    <div class="cell"><label>Scripture + prayer</label><button class="tog" data-k="sp">Not done</button></div>
+    <div class="cell"><label>Meditation + scripting</label><button class="tog" data-k="mi">Not done</button></div>
+    <div class="cell"><label>Skincare routine</label><button class="tog" data-k="sk">Not done</button></div>
+    <div class="cell"><label>Sleep (hours)</label><input id="sleep" type="number" step="0.5" min="0" max="14" inputmode="decimal" placeholder="&ndash;"></div>
+    <div class="cell"><label>Trading rule violations</label><input id="viol" type="number" min="0" max="10" inputmode="numeric" placeholder="0"></div>
+    <div class="cell"><label>Thoughts reframed (of 7)</label><input id="refr" type="number" min="0" max="7" inputmode="numeric" placeholder="&ndash;"></div>
+  </div>
+
+  <div class="sec">Overview</div>
+  <div class="stats" id="stats"></div>
+  <div id="chart"></div>
+
+  <div class="sec">Weekly accountability <small>Review every Sunday. Honest numbers only.</small></div>
+  <table><thead><tr><th>Week</th><th>Days</th><th>Trading avg</th><th>Score /90</th><th>Viol.</th></tr></thead><tbody id="wtbody"></tbody></table>
+
+  <button class="ghostbtn" id="copysum">Copy this week's summary</button>
+
+  <details>
+    <summary>Settings &amp; data</summary>
+    <div class="detbody">
+      <div class="row"><label>Trading goal (your $ target)</label><input id="goal" type="text" placeholder="e.g. 20,000 USD — process over outcome"></div>
+      <div class="row"><label>Starting weight (kg)</label><input id="startw" type="number" step="0.1" inputmode="decimal" placeholder="optional"></div>
+      <div class="row"><label>Weekly loss target (kg)</label><input id="losst" type="number" step="0.1" inputmode="decimal" placeholder="0.9"></div>
+      <div class="row"><label>Trading criteria names (editable)</label><div id="crits"></div></div>
+      <div class="btnrow">
+        <button id="export">Export backup</button>
+        <button id="importBtn">Import backup</button>
+        <button class="danger" id="wipe">Reset all data</button>
+      </div>
+      <input type="file" id="importFile" accept="application/json" style="display:none">
+    </div>
+  </details>
+
+</div>
+
+<div class="savebar"><div class="inner">
+  <button class="save" id="save">Save day <span id="saveday" class="num">1</span></button>
+  <button class="clear2" id="clear">Clear</button>
+</div></div>
+<div class="saved" id="saved">Saved. Day locked in.</div>
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+var DK='c75_data', SK='c75_settings';
+var DEFT=["Top-down before entry","Valid flag formation","Risk ≤1% + SL at structure","No emotional / revenge trade","Entry + exit journaled"];
+var PH=[[10,"Foundation — ruthless consistency"],[25,"Build — add intensity, find your leak"],[50,"Compound — where most quit. Not you."],[65,"Sharpen — cut the noise"],[75,"Finish — become the testimony"]];
+var S=JSON.parse(localStorage.getItem(DK)||'{}');
+var G=JSON.parse(localStorage.getItem(SK)||'{}');
+if(!G.crit||G.crit.length!==5)G.crit=DEFT.slice();
+if(G.loss==null)G.loss=0.9;
+var day=1;
+function $(id){return document.getElementById(id)}
+function persist(){localStorage.setItem(DK,JSON.stringify(S));localStorage.setItem(SK,JSON.stringify(G))}
+function blank(){return{t:[10,10,10,10,10],w:null,wo:0,sp:0,mi:0,sk:0,sl:null,vi:null,rf:null}}
+function toast(m){var t=$('toast');t.textContent=m;t.style.opacity=1;setTimeout(function(){t.style.opacity=0},1600)}
+
+function buildCrit(){
+  var c=$('crits');c.innerHTML='';
+  G.crit.forEach(function(n,i){
+    var inp=document.createElement('input');
+    inp.value=n;inp.style.marginBottom='6px';inp.dataset.ci=i;
+    inp.addEventListener('change',function(){G.crit[i]=inp.value||DEFT[i];persist();buildRows();});
+    c.appendChild(inp);
+  });
+}
+var trows=$('trows');
+function buildRows(){
+  trows.innerHTML='';
+  G.crit.forEach(function(n,i){
+    var r=document.createElement('div');r.className='trow';
+    r.innerHTML='<span class="nm"></span><input type="range" min="0" max="10" step="1" value="10" data-i="'+i+'"><b class="val num" data-b="'+i+'">10</b>';
+    r.querySelector('.nm').textContent=n;
+    trows.appendChild(r);
+  });
+}
+trows.addEventListener('input',function(e){
+  if(e.target.dataset.i==null)return;
+  e.target.parentElement.querySelector('b').textContent=e.target.value;total();
+});
+function total(){
+  var v=0;trows.querySelectorAll('input').forEach(function(x){v+=+x.value});
+  $('ttotalv').textContent=v+' / 50';
+  var c=v>=45?'var(--green)':v>=40?'var(--amber)':'var(--red)';
+  $('ttotal').style.background=c.replace('var(','color-mix(in srgb, var(').replace(') 12%, transparent)');
+  $('ttotalv').style.color=c;
+  return v;
+}
+function setTog(el,on){el.classList.toggle('on',!!on);el.textContent=on?'Done':'Not done'}
+document.querySelectorAll('.tog').forEach(function(b){
+  b.addEventListener('click',function(){b.classList.toggle('on');b.textContent=b.classList.contains('on')?'Done':'Not done'});
+});
+$('workouts').addEventListener('click',function(e){
+  if(e.target.dataset.v==null)return;
+  this.querySelectorAll('button').forEach(function(b){b.classList.toggle('on',b===e.target)});
+});
+function render(){
+  var e=S[day]||blank();
+  buildRows();
+  trows.querySelectorAll('input').forEach(function(x,i){x.value=e.t[i];x.parentElement.querySelector('b').textContent=e.t[i]});
+  total();
+  $('weight').value=e.w==null?'':e.w;
+  $('sleep').value=e.sl==null?'':e.sl;
+  $('viol').value=e.vi==null?'':e.vi;
+  $('refr').value=e.rf==null?'':e.rf;
+  $('workouts').querySelectorAll('button').forEach(function(b){b.classList.toggle('on',+b.dataset.v===e.wo)});
+  document.querySelectorAll('.tog').forEach(function(b){setTog(b,e[b.dataset.k])});
+  $('saveday').textContent=day;
+  var ph=PH[0][1];for(var i=0;i<PH.length;i++)if(day<=PH[i][0]){ph=PH[i][1];break}
+  $('phase').innerHTML='Day <b class="num">'+day+'</b> / 75 &middot; Phase: <b>'+ph+'</b>'+(G.goal?(' &middot; Goal: <b>'+G.goal+'</b>'):'');
+  overview();
+}
+$('save').addEventListener('click',function(){
+  var e=blank();
+  trows.querySelectorAll('input').forEach(function(x,i){e.t[i]=+x.value});
+  e.w=parseFloat($('weight').value);if(isNaN(e.w))e.w=null;
+  e.sl=parseFloat($('sleep').value);if(isNaN(e.sl))e.sl=null;
+  e.vi=parseInt($('viol').value);if(isNaN(e.vi))e.vi=null;
+  e.rf=parseInt($('refr').value);if(isNaN(e.rf))e.rf=null;
+  var wb=$('workouts').querySelector('.on');e.wo=wb?+wb.dataset.v:0;
+  document.querySelectorAll('.tog').forEach(function(b){e[b.dataset.k]=b.classList.contains('on')?1:0});
+  S[day]=e;persist();
+  var s=$('saved');s.style.opacity=1;setTimeout(function(){s.style.opacity=0},1600);
+  overview();
+});
+$('clear').addEventListener('click',function(){delete S[day];persist();render()});
+$('prev').addEventListener('click',function(){if(day>1){day--;$('day').value=day;render()}});
+$('next').addEventListener('click',function(){if(day<75){day++;$('day').value=day;render()}});
+$('day').addEventListener('change',function(){day=Math.min(75,Math.max(1,parseInt(this.value)||1));this.value=day;render()});
+
+function clamp(x,a,b){return Math.max(a,Math.min(b,x))}
+function weekScore(w){
+  var days=[];for(var d=(w-1)*7+1;d<=Math.min(w*7,75);d++)if(S[d])days.push(d);
+  if(!days.length)return null;
+  var n=days.length;
+  var tAvg=days.reduce(function(a,d){return a+S[d].t.reduce(function(x,y){return x+y},0)},0)/n;
+  var wo=days.reduce(function(a,d){return a+S[d].wo},0);
+  var sp=days.reduce(function(a,d){return a+S[d].sp},0);
+  var mi=days.reduce(function(a,d){return a+S[d].mi},0);
+  var sk=days.reduce(function(a,d){return a+S[d].sk},0);
+  var vi=days.reduce(function(a,d){return a+(S[d].vi||0)},0);
+  var rf=days.map(function(d){return S[d].rf}).filter(function(x){return x!=null});
+  var sl=days.map(function(d){return S[d].sl}).filter(function(x){return x!=null});
+  var ws=days.map(function(d){return{d:d,w:S[d].w}}).filter(function(p){return p.w!=null});
+  var sW=ws.length>1?(function(){var wks=(ws[ws.length-1].d-ws[0].d)/7;
+    var lost=(G.startW!=null?G.startW:ws[0].w)-ws[ws.length-1].w;
+    return clamp(lost/(G.loss*wks)*10,0,10)})():(ws.length===1?null:5);
+  var parts=[sW,wo/14*10,sp/7*10,mi/7*10,tAvg/50*10,vi===0?10:clamp(10-vi*2,0,10),sk/7*10,
+    rf.length?rf.reduce(function(a,b){return a+b},0)/rf.length/7*10:null,
+    sl.length?clamp(sl.reduce(function(a,b){return a+b},0)/sl.length/7*10,0,10):null];
+  var sum=0,cnt=0;parts.forEach(function(x){if(x!=null){sum+=x;cnt++}});
+  return{n:n,tAvg:tAvg,vi:vi,score:cnt?sum/cnt*parts.length:null};
+}
+function overview(){
+  var keys=Object.keys(S).map(Number).sort(function(a,b){return a-b});
+  var logged=keys.length;
+  $('bar').style.width=(logged/75*100)+'%';
+  $('barlbl').textContent=logged+' of 75 days logged';
+  var ts=[],firstW=null,lastW=null;
+  keys.forEach(function(d){var e=S[d];ts.push(e.t.reduce(function(x,y){return x+y},0));
+    if(e.w!=null){if(!firstW)firstW={d:d,w:e.w};lastW={d:d,w:e.w}}});
+  var avgT=ts.length?(ts.reduce(function(a,b){return a+b},0)/ts.length).toFixed(1):'–';
+  var streak=0;if(logged){var mx=keys[keys.length-1];for(var d=mx;d>=1;d--){if(S[d])streak++;else break}}
+  var wDelta=(firstW&&lastW&&lastW.d>firstW.d)?((lastW.w-firstW.w).toFixed(1)+' kg'):(firstW?firstW.w+' kg':'–');
+  var bw=0,bwSc=-1;
+  for(var w=1;w<=11;w++){var r=weekScore(w);if(r&&r.score!=null&&r.score>bwSc){bwSc=r.score;bw=w}}
+  $('stats').innerHTML=
+   '<div class="stat"><div class="v num">'+logged+'<span style="font-size:13px;color:var(--text3)"> /75</span></div><div class="k">Days logged</div></div>'+
+   '<div class="stat"><div class="v num">'+avgT+'<span style="font-size:13px;color:var(--text3)"> /50</span></div><div class="k">Avg trading score</div></div>'+
+   '<div class="stat"><div class="v num">'+wDelta+'</div><div class="k">Weight change</div></div>'+
+   '<div class="stat"><div class="v num">'+streak+'</div><div class="k">Current streak</div></div>'+
+   '<div class="stat"><div class="v num">'+(bw||'–')+'</div><div class="k">Best week</div></div>';
+  chart();
+  var tb=$('wtbody');tb.innerHTML='';
+  for(var w=1;w<=11;w++){
+    var r=weekScore(w);var tr=document.createElement('tr');
+    if(!r){tr.innerHTML='<td>Week '+w+'</td><td colspan="4" style="color:var(--text3)">No data yet</td>'}
+    else{
+      var col=r.score>=80?'var(--green)':r.score>=60?'var(--amber)':'var(--red)';
+      tr.innerHTML='<td>Week '+w+'</td><td class="num">'+r.n+'</td><td class="num">'+r.tAvg.toFixed(1)+' / 50</td>'+
+        '<td><span class="pill" style="background:'+col+'22;color:'+col+'">'+(r.score==null?'–':Math.round(r.score))+'</span></td>'+
+        '<td class="num">'+r.vi+'</td>';
+    }
+    tb.appendChild(tr);
+  }
+}
+function chart(){
+  var pts=Object.keys(S).map(Number).sort(function(a,b){return a-b})
+    .filter(function(d){return S[d].w!=null}).map(function(d){return{d:d,w:S[d].w}});
+  var c=$('chart');
+  if(pts.length<2){c.innerHTML='<div class="empty">Log your weight on at least two days to see the trend line.</div>';return}
+  var W=600,H=150,P=26;
+  var ws=pts.map(function(p){return p.w});
+  var mn=Math.min.apply(null,ws),mx=Math.max.apply(null,ws);
+  if(mx-mn<1){mx+=0.5;mn-=0.5}
+  var x=function(d){return P+(d-1)/74*(W-2*P)};
+  var y=function(w){return H-P-(w-mn)/(mx-mn)*(H-2*P)};
+  var path=pts.map(function(p,i){return(i?'L':'M')+x(p.d).toFixed(1)+','+y(p.w).toFixed(1)}).join(' ');
+  var dots=pts.map(function(p){return '<circle cx="'+x(p.d).toFixed(1)+'" cy="'+y(p.w).toFixed(1)+'" r="3" fill="var(--accent)"/>'}).join('');
+  var grid='';
+  for(var g=0;g<=3;g++){var gy=P+g*(H-2*P)/3;
+    grid+='<line x1="'+P+'" y1="'+gy+'" x2="'+(W-P)+'" y2="'+gy+'" stroke="var(--border)" stroke-width="0.5"/>'+
+          '<text x="'+(P-6)+'" y="'+(gy+3)+'" font-size="10" fill="var(--text3)" text-anchor="end">'+(mx-g*(mx-mn)/3).toFixed(1)+'</text>'}
+  c.innerHTML='<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;display:block"><text x="'+P+'" y="13" font-size="11" fill="var(--text3)">Weight trend (kg) across 75 days</text>'+grid+
+   '<path d="'+path+'" fill="none" stroke="var(--accent)" stroke-width="2"/>'+dots+'</svg>';
+}
+$('copysum').addEventListener('click',function(){
+  var mx=0;Object.keys(S).forEach(function(d){mx=Math.max(mx,+d)});
+  var wk=clamp(Math.ceil(mx/7)||1,1,11),r=weekScore(wk);
+  if(!r){toast('No data logged yet');return}
+  var txt='Week '+wk+' — 75 Hard Covenant\nDays logged: '+r.n+'\nAvg trading score: '+r.tAvg.toFixed(1)+'/50\nRule violations: '+r.vi+'\nAccountability score: '+(r.score==null?'incomplete':Math.round(r.score))+'/90';
+  if(navigator.clipboard){navigator.clipboard.writeText(txt).then(function(){toast('Summary copied')},function(){toast('Copy failed')})}
+});
+$('export').addEventListener('click',function(){
+  var blob=new Blob([JSON.stringify({data:S,settings:G},null,2)],{type:'application/json'});
+  var a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download='covenant75-backup.json';a.click();URL.revokeObjectURL(a.href);
+});
+$('importBtn').addEventListener('click',function(){$('importFile').click()});
+$('importFile').addEventListener('change',function(){
+  var f=this.files[0];if(!f)return;
+  var rd=new FileReader();
+  rd.onload=function(){
+    try{var j=JSON.parse(rd.result);
+      if(j.data)S=j.data;if(j.settings)G=j.settings;
+      persist();buildCrit();render();toast('Backup imported');
+    }catch(e){toast('Invalid file')}
+  };
+  rd.readAsText(f);this.value='';
+});
+$('wipe').addEventListener('click',function(){
+  if(confirm('Delete ALL logged data and settings? This cannot be undone.')){
+    S={};G={crit:DEFT.slice(),loss:0.9};persist();buildCrit();render();toast('All data reset');
+  }
+});
+$('goal').addEventListener('change',function(){G.goal=this.value;persist();render()});
+$('startw').addEventListener('change',function(){G.startW=parseFloat(this.value)||null;persist();overview()});
+$('losst').addEventListener('change',function(){G.loss=parseFloat(this.value)||0.9;persist();overview()});
+$('goal').value=G.goal||'';$('startw').value=G.startW||'';$('losst').value=G.loss;
+buildCrit();
+render();
+})();
+</script>
+</body>
+</html>
